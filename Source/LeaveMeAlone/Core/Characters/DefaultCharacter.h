@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Core/Components/LMAHealthComponent.h"
 #include "DefaultCharacter.generated.h"
+
 
 class UCameraComponent;
 class USpringArmComponent;
+
 
 UCLASS()
 class LEAVEMEALONE_API ADefaultCharacter : public ACharacter
@@ -43,6 +46,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cursor")
 	FVector CursorSize = FVector(10.0f, 20.0f, 20.0f);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ComponentsHealth")
+	ULMAHealthComponent* HealthComponent;
 
 protected:
 	// Called when the game starts or when spawned

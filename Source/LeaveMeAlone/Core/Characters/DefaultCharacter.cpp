@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 
+
 // Sets default values
 ADefaultCharacter::ADefaultCharacter()
 {
@@ -34,6 +35,8 @@ ADefaultCharacter::ADefaultCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
 
 }
 
