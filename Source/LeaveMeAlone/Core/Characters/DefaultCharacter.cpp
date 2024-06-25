@@ -8,6 +8,7 @@
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 
@@ -52,6 +53,8 @@ void ADefaultCharacter::BeginPlay()
 			Cursor = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
 		}
 	}
+
+	HealthComponent->OnDeath.AddUObject(this, &ADefaultCharacter::OnDeath);
 }
 
 // Called every frame
@@ -113,4 +116,11 @@ void ADefaultCharacter::ZoomOut()
 		CurrentZoom += ZoomStep;
 		SpringArm->TargetArmLength = CurrentZoom;
 	}
+}
+
+void ADefaultCharacter::OnDeath()
+{
+	PlayAnimMontage(DeathMontage);
+	GetCharacterMovement()->DisableMovement();
+	SetLifeSpan(5.0f);
 }

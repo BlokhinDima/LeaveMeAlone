@@ -10,6 +10,7 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class UAnimMontage;
 
 
 UCLASS()
@@ -50,6 +51,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ComponentsHealth")
 	ULMAHealthComponent* HealthComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -74,5 +78,8 @@ private:
 	float FOV = 55.0f;
 
 	float CurrentZoom;
+
+private:
+	void OnDeath();
 
 };
