@@ -6,9 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "LMAHealthComponent.generated.h"
 
-
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
-
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEAVEMEALONE_API ULMAHealthComponent : public UActorComponent
@@ -19,32 +18,33 @@ public:
 	// Sets default values for this component's properties
 	ULMAHealthComponent();
 
+public:
 	UFUNCTION(BlueprintCallable)
 	float GetHealth() const { return Health; }
 
 	UFUNCTION(BlueprintCallable)
 	bool IsDead() const;
 
+	bool AddHealth(float NewHealth);
+	bool IsHealthFull() const;
+
 public:
-
 	FOnDeath OnDeath;
-
-protected:
-
-	UPROPERTY(EditDefaultsOnly)
-	float MaxHealth = 100.0f;
+	FOnHealthChanged OnHealthChanged;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	float MaxHealth = 100.0f;
+
 private:
-
-	float Health = 0.0f;
-
 	UFUNCTION()
-	void OnTakeAnyDamage(
-		AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
 		class AController* InstigatedBy, AActor* DamageCauser);
 
+private:
+	float Health = 0.0f;
 };

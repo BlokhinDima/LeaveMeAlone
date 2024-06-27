@@ -22,7 +22,42 @@ public:
 	// Sets default values for this character's properties
 	ADefaultCharacter();
 
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void OnHealthChanged(float NewHealth);
+
+	UFUNCTION()
+	ULMAHealthComponent* GetHealthComponent() const { return HealthComponent; }
+
+	UFUNCTION(BlueprintCallable)
+	bool IsInSprintState() const { return InSprintState; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetStamina() const { return Stamina; }
+
 protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void Sprint();
+	void TurnOffSprintState();
+	void TurnOnSprintState();
+	void ZoomIn();
+	void ZoomOut();
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	float SprintSpeed = 600.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float WalkSpeed = 300.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float MaxZoom = 1500.0f;
@@ -32,6 +67,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float ZoomStep = 50.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float MaxStamina = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float StaminaRestoreCoeff = 0.2f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float StaminaReductionCoeff = 1.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
 	UCameraComponent* Camera;
@@ -54,32 +98,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* DeathMontage;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void ZoomIn();
-	void ZoomOut();
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+private:
+	void OnDeath();
+	void RotationPlayerOnCursor();
 
 private:
 	float YRotation = -75.0f;
-
 	float DefaultArmLength = 2000.0f;
-
 	float FOV = 55.0f;
-
 	float CurrentZoom;
-
-private:
-	void OnDeath();
-
+	float Stamina;
+	bool InSprintState = false;
 };

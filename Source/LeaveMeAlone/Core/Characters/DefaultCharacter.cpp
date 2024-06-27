@@ -11,12 +11,13 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-
 // Sets default values
 ADefaultCharacter::ADefaultCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	Stamina = MaxStamina;
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	SpringArm->SetupAttachment(GetRootComponent());
@@ -38,7 +39,6 @@ ADefaultCharacter::ADefaultCharacter()
 	bUseControllerRotationRoll = false;
 
 	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
-
 }
 
 // Called when the game starts or when spawned
@@ -55,6 +55,10 @@ void ADefaultCharacter::BeginPlay()
 	}
 
 	HealthComponent->OnDeath.AddUObject(this, &ADefaultCharacter::OnDeath);
+	OnHealthChanged(HealthComponent->GetHealth());
+	HealthComponent->OnHealthChanged.AddUObject(this, &ADefaultCharacter::OnHealthChanged);
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Stamina = %f"), Stamina));
 }
 
 // Called every frame
@@ -62,19 +66,18 @@ void ADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (GetWorld())
+	if (!(HealthComponent->IsDead()))
 	{
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (PlayerController)
+		RotationPlayerOnCursor();
+	}
+
+	if (!InSprintState && Stamina < MaxStamina)
+	{
+		Stamina = FMath::Clamp(Stamina + StaminaRestoreCoeff, 0.0f, MaxStamina);
+
+		if (Stamina == MaxStamina)
 		{
-			FHitResult HitResult;
-			PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult);
-			float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), HitResult.Location).Yaw;
-			SetActorRotation(FQuat(FRotator(0.0f, FindRotatorResultYaw, 0.0f)));
-			if (Cursor)
-			{
-				Cursor->SetWorldLocation(HitResult.Location);
-			}
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Stamina = %f"), Stamina));
 		}
 	}
 }
@@ -87,7 +90,9 @@ void ADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("MoveRight", this, &ADefaultCharacter::MoveRight);
 	PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &ADefaultCharacter::ZoomIn);
 	PlayerInputComponent->BindAction("ZoomOut", IE_Pressed, this, &ADefaultCharacter::ZoomOut);
-
+	PlayerInputComponent->BindAction("Sprint", IE_Repeat, this, &ADefaultCharacter::Sprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ADefaultCharacter::TurnOnSprintState);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ADefaultCharacter::TurnOffSprintState);
 }
 
 void ADefaultCharacter::MoveForward(float Value)
@@ -98,6 +103,18 @@ void ADefaultCharacter::MoveForward(float Value)
 void ADefaultCharacter::MoveRight(float Value)
 {
 	AddMovementInput(GetActorRightVector(), Value);
+}
+
+void ADefaultCharacter::Sprint()
+{
+	Stamina = FMath::Clamp(Stamina - StaminaReductionCoeff, 0.0f, MaxStamina);
+
+	if (Stamina  == 0.0f)
+	{
+		TurnOffSprintState();
+	}
+	
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Stamina = %f"), Stamina));
 }
 
 void ADefaultCharacter::ZoomIn()
@@ -120,7 +137,50 @@ void ADefaultCharacter::ZoomOut()
 
 void ADefaultCharacter::OnDeath()
 {
+	Cursor->DestroyRenderState_Concurrent();
+
 	PlayAnimMontage(DeathMontage);
 	GetCharacterMovement()->DisableMovement();
 	SetLifeSpan(5.0f);
+
+	if (Controller)
+	{
+		Controller->ChangeState(NAME_Spectating);
+	}
+}
+
+void ADefaultCharacter::RotationPlayerOnCursor()
+{
+	if (GetWorld())
+	{
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PlayerController)
+		{
+			FHitResult HitResult;
+			PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult);
+			float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), HitResult.Location).Yaw;
+			SetActorRotation(FQuat(FRotator(0.0f, FindRotatorResultYaw, 0.0f)));
+			if (Cursor)
+			{
+				Cursor->SetWorldLocation(HitResult.Location);
+			}
+		}
+	}
+}
+
+void ADefaultCharacter::OnHealthChanged(float NewHealth)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
+}
+
+void ADefaultCharacter::TurnOnSprintState()
+{ 
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	InSprintState = true; 
+}
+
+void ADefaultCharacter::TurnOffSprintState()
+{ 
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	InSprintState = false; 
 }
