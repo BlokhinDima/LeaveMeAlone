@@ -11,6 +11,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class UAnimMontage;
+class ULMAWeaponComponent;
 
 
 UCLASS()
@@ -97,6 +98,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* DeathMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	ULMAWeaponComponent* WeaponComponent;
 
 private:
 	void OnDeath();

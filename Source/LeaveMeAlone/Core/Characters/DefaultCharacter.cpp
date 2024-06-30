@@ -2,6 +2,7 @@
 
 
 #include "Core/Characters/DefaultCharacter.h"
+#include "Core/Components/LMAWeaponComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/DecalComponent.h"
@@ -39,6 +40,8 @@ ADefaultCharacter::ADefaultCharacter()
 	bUseControllerRotationRoll = false;
 
 	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
+
+	WeaponComponent = CreateDefaultSubobject<ULMAWeaponComponent>("Weapon");
 }
 
 // Called when the game starts or when spawned
@@ -93,6 +96,9 @@ void ADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Sprint", IE_Repeat, this, &ADefaultCharacter::Sprint);
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ADefaultCharacter::TurnOnSprintState);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ADefaultCharacter::TurnOffSprintState);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::StartAutoFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent, &ULMAWeaponComponent::EndAutoFire);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::Reload);
 }
 
 void ADefaultCharacter::MoveForward(float Value)
