@@ -7,12 +7,12 @@
 #include "Core/Components/LMAHealthComponent.h"
 #include "DefaultCharacter.generated.h"
 
-
 class UCameraComponent;
 class USpringArmComponent;
 class UAnimMontage;
 class ULMAWeaponComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDeath);
 
 UCLASS()
 class LEAVEMEALONE_API ADefaultCharacter : public ACharacter
@@ -40,6 +40,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetStamina() const { return Stamina; }
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterDeath OnCharacterDeath;
 
 protected:
 	// Called when the game starts or when spawned

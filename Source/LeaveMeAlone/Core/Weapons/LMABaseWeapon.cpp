@@ -64,9 +64,6 @@ void ALMABaseWeapon::ChangeClip()
 		CurrentAmmoWeapon.Clips--;
 
 	CurrentAmmoWeapon.Bullets = AmmoWeapon.Bullets;
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Black,
-		FString::Printf(TEXT("Clip Changed. Clips Left = %d, Bullets Left = %d"),
-		CurrentAmmoWeapon.Clips, CurrentAmmoWeapon.Bullets));
 }
 
 bool ALMABaseWeapon::IsCurrentClipEmpty() const
@@ -87,7 +84,6 @@ bool ALMABaseWeapon::IsClipsAvaliable() const
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Black, FString::Printf(TEXT("No clips left!")));
 		return false;
 	}
 }
@@ -99,10 +95,6 @@ void ALMABaseWeapon::DecrementBullets()
 	{
 		OnBulletsEnded.Broadcast();
 	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Black, 
-		FString::Printf(TEXT("Clips Left = %d, Bullets Left = %d"), CurrentAmmoWeapon.Clips, CurrentAmmoWeapon.Bullets));
-	UE_LOG(LogWeapon, Display, TEXT("Bullets Left = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
 }
 
 void ALMABaseWeapon::StartFire()

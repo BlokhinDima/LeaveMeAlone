@@ -47,6 +47,7 @@ public:
 	bool IsCurrentClipEmpty() const;
 	bool IsCurrentClipFull() const;
 	bool IsClipsAvaliable() const;
+	FAmmoWeapon GetCurrentAmmoWeapon() const { return CurrentAmmoWeapon; }
 
 public:
 	FOnBulletsEnded OnBulletsEnded;

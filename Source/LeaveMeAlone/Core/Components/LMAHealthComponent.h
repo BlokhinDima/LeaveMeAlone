@@ -6,8 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "LMAHealthComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnDeath)
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float)
+DECLARE_MULTICAST_DELEGATE(FOnDeath);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEAVEMEALONE_API ULMAHealthComponent : public UActorComponent
@@ -37,7 +37,7 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float MaxHealth = 100.0f;
 
 private:

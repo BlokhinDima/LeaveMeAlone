@@ -11,7 +11,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-
 // Sets default values
 ADefaultCharacter::ADefaultCharacter()
 {
@@ -153,6 +152,8 @@ void ADefaultCharacter::OnDeath()
 	{
 		Controller->ChangeState(NAME_Spectating);
 	}
+
+	OnCharacterDeath.Broadcast();
 }
 
 void ADefaultCharacter::RotationPlayerOnCursor()
@@ -176,7 +177,6 @@ void ADefaultCharacter::RotationPlayerOnCursor()
 
 void ADefaultCharacter::OnHealthChanged(float NewHealth)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
 }
 
 void ADefaultCharacter::TurnOnSprintState()
