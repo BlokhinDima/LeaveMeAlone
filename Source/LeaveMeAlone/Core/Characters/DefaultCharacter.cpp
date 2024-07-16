@@ -56,7 +56,7 @@ void ADefaultCharacter::BeginPlay()
 		}
 	}
 
-	HealthComponent->OnDeath.AddUObject(this, &ADefaultCharacter::OnDeath);
+	HealthComponent->OnDeath.AddDynamic(this, &ADefaultCharacter::OnDeath);
 	OnHealthChanged(HealthComponent->GetHealth());
 	HealthComponent->OnHealthChanged.AddUObject(this, &ADefaultCharacter::OnHealthChanged);
 
@@ -153,7 +153,6 @@ void ADefaultCharacter::OnDeath()
 		Controller->ChangeState(NAME_Spectating);
 	}
 
-	OnCharacterDeath.Broadcast();
 }
 
 void ADefaultCharacter::RotationPlayerOnCursor()
