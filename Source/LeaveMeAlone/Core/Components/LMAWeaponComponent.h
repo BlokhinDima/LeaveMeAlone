@@ -23,7 +23,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void StartAutoFire();
+
+	UFUNCTION(BlueprintCallable)
 	void EndAutoFire();
+
 	void Reload();
 
 	UFUNCTION(BlueprintCallable)
